@@ -3,13 +3,32 @@ import react from '@vitejs/plugin-react';
 import path from 'path';
 import {defineConfig} from 'vite';
 
+// Determine appropriate base URL for GitHub Pages or local preview
+const getBaseUrl = (): string => {
+  if (process.env.BASE_URL) return process.env.BASE_URL;
+  if (process.env.VITE_BASE) return process.env.VITE_BASE;
+
+  if (process.env.GITHUB_REPOSITORY) {
+    const parts = process.env.GITHUB_REPOSITORY.split('/');
+    const repo = parts[1];
+    if (repo) {
+      if (repo.toLowerCase().endsWith('.github.io')) {
+        return '/';
+      }
+      return `/${repo}/`;
+    }
+  }
+
+  return './';
+};
+
 export default defineConfig(() => {
   return {
-    base: './',
+    base: getBaseUrl(),
     plugins: [react(), tailwindcss()],
     resolve: {
       alias: {
-        '@': path.resolve(__dirname, '.'),
+        '@': path.resolve(import.meta.dirname || '.'),
       },
     },
     server: {

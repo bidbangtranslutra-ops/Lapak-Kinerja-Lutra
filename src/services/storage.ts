@@ -33,11 +33,48 @@ export interface CustomUploadedSheet {
   uploadedAt: string;
 }
 
+// Safe in-memory fallback for environments where localStorage is restricted or blocked
+const memoryCache: Record<string, string> = {};
+
+const safeStorage = {
+  getItem(key: string): string | null {
+    try {
+      if (typeof window !== 'undefined' && window.localStorage) {
+        const val = window.localStorage.getItem(key);
+        if (val !== null) return val;
+      }
+    } catch (e) {
+      console.warn('localStorage read error, using memory fallback:', e);
+    }
+    return memoryCache[key] ?? null;
+  },
+
+  setItem(key: string, value: string): void {
+    try {
+      if (typeof window !== 'undefined' && window.localStorage) {
+        window.localStorage.setItem(key, value);
+      }
+    } catch (e) {
+      console.warn('localStorage write error, using memory fallback:', e);
+    }
+    memoryCache[key] = value;
+  },
+
+  removeItem(key: string): void {
+    try {
+      if (typeof window !== 'undefined' && window.localStorage) {
+        window.localStorage.removeItem(key);
+      }
+    } catch {}
+    delete memoryCache[key];
+  },
+};
+
 export const StorageService = {
   getUsers(): User[] {
-    const data = localStorage.getItem(STORAGE_KEYS.USERS);
+    const data = safeStorage.getItem(STORAGE_KEYS.USERS);
     if (!data) {
-      localStorage.setItem(STORAGE_KEYS.USERS, JSON.stringify(INITIAL_USERS));
+      safeStorage.setItem(STORAGE_KEYS.USERS, JSON.stringify(INITIAL_USERS));
       return INITIAL_USERS;
     }
     try {
@@ -48,14 +85,14 @@ export const StorageService = {
   },
 
   saveUsers(users: User[]) {
-    localStorage.setItem(STORAGE_KEYS.USERS, JSON.stringify(users));
+    safeStorage.setItem(STORAGE_KEYS.USERS, JSON.stringify(users));
   },
 
   getCurrentUser(): User {
-    const data = localStorage.getItem(STORAGE_KEYS.CURRENT_USER);
+    const data = safeStorage.getItem(STORAGE_KEYS.CURRENT_USER);
     if (!data) {
       const defaultUser = INITIAL_USERS[0];
-      localStorage.setItem(STORAGE_KEYS.CURRENT_USER, JSON.stringify(defaultUser));
+      safeStorage.setItem(STORAGE_KEYS.CURRENT_USER, JSON.stringify(defaultUser));
       return defaultUser;
     }
     try {
@@ -66,13 +103,13 @@ export const StorageService = {
   },
 
   setCurrentUser(user: User) {
-    localStorage.setItem(STORAGE_KEYS.CURRENT_USER, JSON.stringify(user));
+    safeStorage.setItem(STORAGE_KEYS.CURRENT_USER, JSON.stringify(user));
   },
 
   getCapaianKinerja(): CapaianKinerjaItem[] {
-    const data = localStorage.getItem(STORAGE_KEYS.CAPAIAN);
+    const data = safeStorage.getItem(STORAGE_KEYS.CAPAIAN);
     if (!data) {
-      localStorage.setItem(STORAGE_KEYS.CAPAIAN, JSON.stringify(INITIAL_CAPAIAN_KINERJA));
+      safeStorage.setItem(STORAGE_KEYS.CAPAIAN, JSON.stringify(INITIAL_CAPAIAN_KINERJA));
       return INITIAL_CAPAIAN_KINERJA;
     }
     try {
@@ -83,13 +120,13 @@ export const StorageService = {
   },
 
   saveCapaianKinerja(items: CapaianKinerjaItem[]) {
-    localStorage.setItem(STORAGE_KEYS.CAPAIAN, JSON.stringify(items));
+    safeStorage.setItem(STORAGE_KEYS.CAPAIAN, JSON.stringify(items));
   },
 
   getLKEComponents(): LKEEvaluationComponent[] {
-    const data = localStorage.getItem(STORAGE_KEYS.LKE_COMPONENTS);
+    const data = safeStorage.getItem(STORAGE_KEYS.LKE_COMPONENTS);
     if (!data) {
-      localStorage.setItem(STORAGE_KEYS.LKE_COMPONENTS, JSON.stringify(INITIAL_LKE_COMPONENTS));
+      safeStorage.setItem(STORAGE_KEYS.LKE_COMPONENTS, JSON.stringify(INITIAL_LKE_COMPONENTS));
       return INITIAL_LKE_COMPONENTS;
     }
     try {
@@ -100,13 +137,13 @@ export const StorageService = {
   },
 
   saveLKEComponents(items: LKEEvaluationComponent[]) {
-    localStorage.setItem(STORAGE_KEYS.LKE_COMPONENTS, JSON.stringify(items));
+    safeStorage.setItem(STORAGE_KEYS.LKE_COMPONENTS, JSON.stringify(items));
   },
 
   getLKECriteria(): LKECriteriaItem[] {
-    const data = localStorage.getItem(STORAGE_KEYS.LKE_CRITERIA);
+    const data = safeStorage.getItem(STORAGE_KEYS.LKE_CRITERIA);
     if (!data) {
-      localStorage.setItem(STORAGE_KEYS.LKE_CRITERIA, JSON.stringify(INITIAL_LKE_CRITERIA));
+      safeStorage.setItem(STORAGE_KEYS.LKE_CRITERIA, JSON.stringify(INITIAL_LKE_CRITERIA));
       return INITIAL_LKE_CRITERIA;
     }
     try {
@@ -117,13 +154,13 @@ export const StorageService = {
   },
 
   saveLKECriteria(items: LKECriteriaItem[]) {
-    localStorage.setItem(STORAGE_KEYS.LKE_CRITERIA, JSON.stringify(items));
+    safeStorage.setItem(STORAGE_KEYS.LKE_CRITERIA, JSON.stringify(items));
   },
 
   getDokumenSAKIP(): DokumenSAKIPItem[] {
-    const data = localStorage.getItem(STORAGE_KEYS.DOKUMEN);
+    const data = safeStorage.getItem(STORAGE_KEYS.DOKUMEN);
     if (!data) {
-      localStorage.setItem(STORAGE_KEYS.DOKUMEN, JSON.stringify(INITIAL_DOKUMEN_SAKIP));
+      safeStorage.setItem(STORAGE_KEYS.DOKUMEN, JSON.stringify(INITIAL_DOKUMEN_SAKIP));
       return INITIAL_DOKUMEN_SAKIP;
     }
     try {
@@ -134,11 +171,11 @@ export const StorageService = {
   },
 
   saveDokumenSAKIP(docs: DokumenSAKIPItem[]) {
-    localStorage.setItem(STORAGE_KEYS.DOKUMEN, JSON.stringify(docs));
+    safeStorage.setItem(STORAGE_KEYS.DOKUMEN, JSON.stringify(docs));
   },
 
   getCustomSheets(): CustomUploadedSheet[] {
-    const data = localStorage.getItem(STORAGE_KEYS.CUSTOM_SHEETS);
+    const data = safeStorage.getItem(STORAGE_KEYS.CUSTOM_SHEETS);
     if (!data) return [];
     try {
       return JSON.parse(data);
@@ -148,7 +185,7 @@ export const StorageService = {
   },
 
   saveCustomSheets(sheets: CustomUploadedSheet[]) {
-    localStorage.setItem(STORAGE_KEYS.CUSTOM_SHEETS, JSON.stringify(sheets));
+    safeStorage.setItem(STORAGE_KEYS.CUSTOM_SHEETS, JSON.stringify(sheets));
   },
 
   // Export Capaian to real .xlsx file
