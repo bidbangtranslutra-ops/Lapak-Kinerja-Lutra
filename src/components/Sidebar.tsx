@@ -15,6 +15,7 @@ import {
   Award,
 } from 'lucide-react';
 import { ActiveTab, LKETab, User } from '../types/sakip';
+import logoLuwuUtara from '../assets/logo_luwu_utara.png';
 
 interface SidebarProps {
   activeTab: ActiveTab;
@@ -76,7 +77,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
           {/* Logo Asli Luwu Utara yang diunggah pengguna */}
           <div className="flex-shrink-0 flex items-center justify-center">
             <img
-              src="/Luwu_Utara_Logo_(North_Luwu).png"
+              src={logoLuwuUtara}
               alt="Logo Kabupaten Luwu Utara"
               className="h-12 w-auto object-contain filter-none"
             />

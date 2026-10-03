@@ -1,4 +1,5 @@
 import React from 'react';
+import logoLuwuUtara from '../assets/logo_luwu_utara.png';
 
 interface KopDinasPrintProps {
   title?: string;
@@ -20,7 +21,7 @@ export const KopDinasPrint: React.FC<KopDinasPrintProps> = ({
         <div className="w-20 h-20 flex-shrink-0 flex items-center justify-center">
           {/* Logo Asli Luwu Utara */}
           <img
-            src="/Luwu_Utara_Logo_(North_Luwu).png"
+            src={logoLuwuUtara}
             alt="Logo Pemerintah Kabupaten Luwu Utara"
             className="w-16 h-auto object-contain filter-none"
           />

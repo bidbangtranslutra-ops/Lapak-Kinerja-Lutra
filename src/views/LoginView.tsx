@@ -12,6 +12,7 @@ import {
   FileText,
 } from 'lucide-react';
 import { User } from '../types/sakip';
+import logoLuwuUtara from '../assets/logo_luwu_utara.png';
 
 interface LoginViewProps {
   onLoginSuccess: (user: User) => void;
@@ -100,7 +101,7 @@ export const LoginView: React.FC<LoginViewProps> = ({
         {/* Logo Asli Luwu Utara yang diunggah */}
         <div className="mx-auto flex items-center justify-center mb-4">
           <img
-            src="/Luwu_Utara_Logo_(North_Luwu).png"
+            src={logoLuwuUtara}
             alt="Logo Kabupaten Luwu Utara"
             className="h-20 w-auto object-contain filter-none drop-shadow-lg"
           />
